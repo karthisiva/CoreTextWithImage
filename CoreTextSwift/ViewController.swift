@@ -11,102 +11,160 @@ import  CoreText
 class ViewController: UIViewController,UIScrollViewDelegate {
     var textManger : NSTextStorage!
     var layoutManager : NSLayoutManager!
-    var textView = UITextView()
+    //  var textView = UITextView()
     @IBOutlet var scrollObj: UIScrollView!
     @IBOutlet var pageDots: UIPageControl!
+    let htmlString = "<div>This recipe is almost identical to the one in Two Different-Width Views; however, here you use a pair of constraints to define a more complex behavior for the view widths. In this recipe, the system tries to make the red view twice as wide as the blue view, but the blue view has a 150-point minimum width. So, on iPhone in portrait the views are almost the same width, and in landscape both views are larger, but the red view is now twice as wide as the blue.\n\n</div><div>Always select the layout that works best for your app. This recipe uses a fixed 20-point margin for both the top and bottom. This keeps the constraint logic as simple as possible, and still looks reasonable in all orientations. Other layouts may work better with a fixed 8-point margin.</div><div>You can extend this design by adding additional constraints—for example, by using three constraints. A required constraint to set the red view’s minimum width. A high-priority optional constraint to set the blue view’s minimum width, and a lower priority optional constraint to set the preferred size ratio between the views.</div>"
+    
+    
+    
+    var scrollHeight = 0
+    var scrollWidth = 0
+    var imageWidth = 0
+    var lastRenderedGlyph = 0
+    var columnIndex  = 0
     override func viewDidLoad() {
         super.viewDidLoad()
-        let contentURL = Bundle.main.url(forResource: "content", withExtension: "txt")
-        do {
-            self.textManger = try NSTextStorage(url: contentURL!, options: [:], documentAttributes: nil)
-        }
-        catch {
-            
-        }
+        self.textManger = NSTextStorage(string:htmlString )
         self.layoutManager = NSLayoutManager()
         textManger.addLayoutManager(layoutManager)
+        scrollHeight = Int(self.scrollObj.bounds.size.height - 20)
+        scrollWidth = Int(self.scrollObj.bounds.size.width / 3 - 10)
+        imageWidth = Int(scrollWidth + scrollWidth )
         self . ect()
-        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        //        var previousView: UIView?
+        //        var columnIndex  = 0
+        //         let scrollHeight = self.scrollObj.bounds.size.height - 20
+        //        let scrollWidth = self.scrollObj.bounds.size.width / 3
+        //        print(scrollHeight)
+        //        for _ in 0 ..< 5 {
+        //            let textView = UITextView()
+        //            textView.translatesAutoresizingMaskIntoConstraints = false
+        //            textView.backgroundColor = .green
+        //            textView.isScrollEnabled = false
+        //            scrollObj.addSubview(textView)
+        //
+        //            if let previousView = previousView {
+        //                textView.leadingAnchor.constraint(equalTo: previousView.trailingAnchor, constant: 10).isActive = true
+        //            } else {
+        //                textView.leadingAnchor.constraint(equalTo: scrollObj.leadingAnchor, constant: 0).isActive = true
+        //            }
+        //
+        //            NSLayoutConstraint.activate([
+        //                textView.heightAnchor.constraint(equalToConstant: scrollHeight),
+        //                textView.widthAnchor.constraint(equalToConstant: scrollWidth),
+        //                textView.topAnchor.constraint(equalTo: scrollObj.topAnchor, constant: 10),
+        //                textView.bottomAnchor.constraint(equalTo: scrollObj.bottomAnchor, constant: -10)
+        //                ])
+        //
+        //            previousView = textView
+        //            columnIndex = columnIndex + 1
+        //
+        //        }
+        //        self.scrollObj.contentSize = CGSize(width: columnIndex*300, height: columnIndex*200)
+        
+        
     }
-    func rotated() {
-        if UIDevice.current.orientation.isLandscape {
-            print("Landscape")
-            view.layoutIfNeeded()
-        } else {
-            print("Portrait")
-            view.layoutIfNeeded()
-        }
-        //        self . ect()
+    override func viewWillLayoutSubviews(){
+        self.view.layoutIfNeeded()
+        //self .ect()
     }
+    
     func ect() {
-        var columnIndex: CGFloat = 0
-        var lastRenderedGlyph = 0
-        var currentXOffset: CGFloat = 0
-        var columnSize = CGSize()
-        var textViewFrame = CGRect()
-        do {
-            while lastRenderedGlyph < layoutManager.numberOfGlyphs {
-                if columnIndex == 1  {
-                    let imageView = UIImageView()
-                    imageView.image = UIImage(named: "zombie2.jpg")
-                    imageView.frame =  CGRect(x: currentXOffset, y: 20, width: textViewFrame.size.width + textViewFrame.size.width-10, height: 200)
-                    self.scrollObj .addSubview(imageView)
-                    
-                    textViewFrame = CGRect(x: currentXOffset, y: CGFloat(200), width: CGFloat(self.view.bounds.width / 3), height: CGFloat(self.view.bounds.height - 274))
-                    
-                    columnSize = CGSize(width: CGFloat(textViewFrame.width - 20), height: CGFloat(textViewFrame.height - 20))
-                    
-                    
-                }else if columnIndex == 2{
-                    textViewFrame = CGRect(x: currentXOffset, y: CGFloat(200), width: CGFloat(self.view.bounds.width / 3), height: CGFloat(self.view.bounds.height - 274))
-                    
-                    columnSize = CGSize(width: CGFloat(textViewFrame.width - 20), height: CGFloat(textViewFrame.height - 20))
-                }
-                else{
-                    textViewFrame = CGRect(x: currentXOffset, y: 0, width: CGFloat(self.view.bounds.width / 3), height: CGFloat(self.view.bounds.height - 74))
-                    
-                    columnSize = CGSize(width: CGFloat(textViewFrame.width - 20), height: CGFloat(textViewFrame.height - 20))
-                }
+        
+        var temp = 0
+        for view in scrollObj.subviews{
+            temp = temp + 1
+            let index = 100 + temp
+            if index == view.tag || view.tag == 999{
+                view .removeFromSuperview()
+            }else{
                 
-                //                if columnIndex == 1 || columnIndex == 2{
-                //                    let imageView = UIImageView()
-                //                    imageView.image = UIImage(named: "zombie2.jpg")
-                //                    imageView.frame =  CGRect(x: 0, y: 0, width: textView.frame.size.width + 200, height: textView.frame.size.width + 100)
-                //                    let path = UIBezierPath(rect: CGRect(x: 0, y:textView.frame.size.height + 200 , width: textView.frame.size.width, height: textView.frame.size.width + 200))
-                //                    textView.textContainer.exclusionPaths = [path]
-                //                    textView.addSubview(imageView)
-                //                }
-                columnIndex = columnIndex + 1
+            }
+            //view .removeFromSuperview()
+        }
+        do {
+            var textViewFrame = CGRect()
+            var previousAnchor = scrollObj.leadingAnchor
+            let imageView = UIImageView()
+            let  columnSize = CGSize(width:scrollWidth , height: scrollHeight)
+            
+            while lastRenderedGlyph < layoutManager.numberOfGlyphs  {
                 let textContainer = NSTextContainer(size: columnSize)
                 layoutManager.addTextContainer(textContainer)
-                // And a text view to render it
-                self.textView = UITextView(frame: textViewFrame, textContainer: textContainer)
-                let htmlString = "<div style='margin: 0px; padding: 0px; font-size: 13px;'>புதுடெல்லி,</div><div style='margin: 0px; padding: 0px; font-size: 13px;'><br /></div><div style='margin: 0px; padding: 0px; font-size: 13px;'>கள்ள google.com   https://www.youtube.com/watch?v=LqHzHkuXRxQ நோட்டு மற்றும் கருப்பு பணத்தை ஒழிக்கும்<p> <h1>நடவடிக்கையாக 500, 1,000 ரூபாய் நோட்டுகள் செல்லாது என்று பிரதமர் நரேந்திர மோடி அறிவித்தார். இதை எதிர்த்து டெல்லியை சேர்ந்த வக்கீல்கள் விவேக்நாராயண்</h1> </p>சர்மா, சங்கம்லால் பாண்டே, தனிநபர்கள் எஸ்.முத்துக்குமார், அடில் ஆல்வி ஆகியோர் சுப்ரீம் கோர்ட்டில் பொதுநல மனுக்கள் தாக்கல் செய்தனர்.</div><div style='margin: 0px; padding: 0px; font-size: 13px;'><br /></div><div> <img src=\"http://img.maalaimalar.com/Articles/2016/Dec/201612271254096075_Vaiko-Announces-MDMK-Withdrew-from-Makkal-Nala-Kootani_medVPF.gif\" alt=\"\" style=\"width:500px;height:128px;\"> </div><div style='margin: 0px; padding: 0px; font-size: 13px;'>இந்த மனுவை விசாரித்த சுப்ரீம் கோர்ட்டு, மத்திய அரசின் அறிவிப்புக்கு தடை விதிக்க மறுப்பு தெரிவித்தது. மேலும் வழக்கு விசாரணையை வரும் நவம்பர் 25 ஆம் தேதிக்கு ஒத்திவைத்து ,மத்திய அரசு தற்போது உள்ள நெருக்கடியை சமாளிக்கும் வகையில் எடுத்துவரும் நடவடிக்கைகள் பற்றியும்,www.google.com    &amp;     &quot;  &#39;  &#8216;    &#8217;      &#8220;     &#8221; வருங்காலத்தில் எடுக்கப்போகும் நடவடிக்கைகள் பற்றியும் அட்டார்னி ஜெனரல் விரிவான அறிக்கையை 18–ந் தேதி தாக்கல் செய்ய வேண்டும் என்று நீதிபதி உத்தரவிட்டனர்.</div><div style='margin: 0px; padding: 0px; font-size: 13px;'><br /></div><div style='margin: 0px; padding: 0px; font-size: 13px;'>இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது.<div>  </div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div> </div> மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில்,<div>  </div> சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.</div>\n\n </div> சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.</div><br> </div> சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.</div></br>/n/n </div> சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.</div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div>  </div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div> </div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும்  மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div>  </div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div> </div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div> <img src=\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxD2QTPxW4NROWV9CB2J7DigMhpjVkCbh4FlUUt6LchrTKCP7cxxy3nU2E\" alt=\"HTML5 Icon\" style=\"width:350px;height:128px;\"> </div></div> இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக மத்திய அரசின் முடிவுக்கு எதிராக மாநில உயர் நீதிமன்றங்கள் மற்றும் மாவட்ட கீழமை நீதிமன்றங்களில் தொடரப்படும் வழக்குகளை விசாரிக்க தடைவிதிக்க வேண்டும் என்று கோரப்பட்டுள்ளது. இந்த மனுவை நாளைக்கு விசாரிக்க சுப்ரீம் கோர்ட் சம்மதம் தெரிவித்துள்ளது.இந்த நிலையில், சுப்ரீம் கோர்ட்டில் மத்திய அரசு இன்று புதிய மனு ஒன்றை தாக்கல் செய்துள்ளது. அதில், ரூபாய் நோட்டுக்கள் தொடர்பாக<div>"
-                //                let htmlString = "<div>\n<img src=\"http://images.parenting.mdpcdn.com/sites/parenting.com/files/styles/slide/public/baby-santa-hat.jpg?itok=QXsVQcFZ\" width=\"200\" height=\"200\" alt=\"\" />\nஊத்துக்கோட்டை:</div><div><br /></div><div>பூண்டி ஏரியில் நீர்மட்டம் குறைந்ததை அடுத்து கிருஷ்ணா நதி நீர் பங்கீடு திட்டத்தின்படி கண்டலேறு அணையில் இருந்து கடந்த 9-ந் தேதி தண்ணீர் திறக்கப்பட்டது.</div><div><br /><br>\n</br></div><div><br /></div><div><br /></div><div>இந்த தண்ணீர் 17-ந் தேதி பூண்டி ஏரிக்கு வந்தடைந்தது. கண்டலேறு அணையில் வினாடிக்கு 1500 கனஅடி வீதம் திறக்கப்பட்ட தண்ணீர் பூண்டி ஏரிக்கு 63 கனஅடி மட்டும் வந்து சேர்ந்தது. இது படிப்படியாக குறைந்தது. நேற்று காலை தண்ணீர் வரத்து முழுவதுமாக நின்றது.</div><div><br /></div><div>ஆந்திர விவசாயிகள் தண்ணீர் திருடுவதால் பூண்டி ஏரிக்கு நீர் வரத்து முற்றிலும் தடைப்பட்டது. இதையடுத்து தண்ணீர் திருடும் விவசாயிகள் மீது நடவடிக்கை எடுக்க வேண்டும் என்று தமிழக பொதுப் பணித்துறை அதிகாரிகள் நெல்லூர்\n<img src=\"http://images.parenting.mdpcdn.com/sites/parenting.com/files/styles/slide/public/baby-santa-hat.jpg?itok=QXsVQcFZ\" width=\"300\" height=\"600\" alt=\"\" />\nமாவட்ட கலெக்டர் முத்தியாலாராஜீக்கு கடிதம் எழுதினர்.</div><div><br /></div><div>இதைத் தொடர்ந்து இது பற்றி நடவடிக்கை எடுக்க ஆந்திர பொதுப்பணித்துறை அதிகாரிகளுக்கு கலெக்டர் உத்தரவிட்டார். கண்டலேறு அணையில் இருந்து தமிழக எல்லையான ‘ஜீரோ’ பாய்ண்ட் வரை கிருஷ்ணா கால்வாயில் 152 கிலோ மீட்டர் தூரத்தில் 900 சிறிய மதகுகள் உள்ளன. இவை அனைத்தும் ஆந்திர விவசாயிகள் திறந்து வைத்ததால் பூண்டி ஏரிக்கு சென்ற தண்ணீர் முழுவதும் விவசாய நிலத்திற்கு பாய்ந்து இருப்பது தெரிந்தது.</div><div><br /></div><div>இதையடுத்து ஆந்திர\n <img src=\"http://images.parenting.mdpcdn.com/sites/parenting.com/files/styles/slide/public/baby-santa-hat.jpg?itok=QXsVQcFZ\" width=\"300\" height=\"200\" alt=\"\" />\nபொதுப்பணித்துறை அதிகாரிகள் கிருஷ்ணா கால்வாய் முழுவதும் ஆய்வு செய்து 900 மதகுகளையும் மூடி வருகின்றனர். மதகுகளை திறந்தால் கடும் நடவடிக்கை எடுக்கப்படும் என்று அதிகாரிகள் எச்சரித்து உள்ளனர்.</div><div><br /></div><div>இன்று காலை நிலவரப்படி கண்டலேறு அணையில் இருந்து 1700 கனஅடி வீதம் தண்ணீர் திறக்கப்படுகிறது. ஆனால் பூண்டி ஏரிக்கு தண்ணீர் வரத்து இல்லை. கிருஷ்ணா கால்வாயில் உள்ள மதகுகள் மூடப்பட்டு வருவதால் பூண்டி ஏரிக்கு தண்ணீர் வரத்து அதிகரிக்கும் என்று எதிர்பார்க்கப்படுகிறது.</div><div><br /></div><div>பூண்டி ஏரியில் இன்று காலை நிலவரப்படி 17 அடியாக (மொத்த உயரம் 35 அடி) நீர்மட்டம் பதிவானது. 83 மில்லியன் கனஅடி தண்ணீர் இருப்பு உள்ளது.</div><div><br /></div><div>கடந்த ஆண்டு இதே நாளில் கனமழை காரணமாக பூண்டி ஏரியில் 33.70 அடி தண்ணீர் இருந்தது குறிப்பிடத்தக்கது.</div><div>பூண்டி ஏரியில் தற்போது நீர்மட்டம் குறைந்து உள்ளதால் புழல் ஏரிக்கு லிங்க்கால்வாய் மூலம் தண்ணீர் திறப்பது நிறுத்தப்பட்டு உள்ளது.</div><div align=\"center\"><object height=\"360\"><embed src=\"https://www.youtube.com/embed/FH_BHLigMVQ \" height=\"360px\" width=\"100%\" /></object></div>"
                 
-                textView.attributedText = htmlString.utf8Data?.attributedString
+                if columnIndex == 1{
+                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
+                    
+                }else if columnIndex == 2{
+                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
+                    
+                }else{
+                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
+                }
+                // And a text view to render it
+                let textView = UITextView(frame: textViewFrame, textContainer: textContainer)
+                // And a text view to render it
+                textView.attributedText = htmlString.utf8Data?.attributedStringColumnWise
                 textView.isScrollEnabled = false
+                textView.translatesAutoresizingMaskIntoConstraints = false
+                textView.backgroundColor = .green
                 self.scrollObj.addSubview(textView)
-                // Increase the current offset
-                currentXOffset += textViewFrame.width
-                // And find the index of the glyph we've just rendered
+                
+                if columnIndex == 0 {
+                    NSLayoutConstraint.activate([
+                        textView.leadingAnchor.constraint(equalTo: previousAnchor, constant: 10),
+                        textView.widthAnchor.constraint(equalToConstant: CGFloat(scrollWidth)),
+                        textView.topAnchor.constraint(equalTo: scrollObj.topAnchor, constant: 10),
+                        textView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30)
+                        ])
+                }else if columnIndex == 1 {
+                    
+                    imageView.translatesAutoresizingMaskIntoConstraints = false
+                    imageView.image = UIImage(named: "zombie2.jpg")
+                    scrollObj.addSubview(imageView)
+                    NSLayoutConstraint.activate([
+                        imageView.leadingAnchor.constraint(equalTo: previousAnchor, constant: 10),
+                        imageView.widthAnchor.constraint(equalToConstant: CGFloat(imageWidth)),
+                        imageView.heightAnchor.constraint(equalToConstant: CGFloat(400)),
+                        imageView.topAnchor.constraint(equalTo: scrollObj.topAnchor, constant: 10)
+                        ])
+                    
+                    NSLayoutConstraint.activate([
+                        textView.leadingAnchor.constraint(equalTo: previousAnchor, constant: 10),
+                        textView.widthAnchor.constraint(equalToConstant: CGFloat(scrollWidth)),
+                        textView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+                        textView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30)
+                        ])
+                }else if columnIndex == 2{
+                    NSLayoutConstraint.activate([
+                        textView.leadingAnchor.constraint(equalTo: previousAnchor, constant: 10),
+                        textView.widthAnchor.constraint(equalToConstant: CGFloat(scrollWidth-10)),
+                        textView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+                        textView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30)
+                        ])
+                }else{
+                    NSLayoutConstraint.activate([
+                        textView.leadingAnchor.constraint(equalTo: previousAnchor, constant: 10),
+                        textView.widthAnchor.constraint(equalToConstant: CGFloat(scrollWidth)),
+                        textView.topAnchor.constraint(equalTo: scrollObj.topAnchor, constant: 10),
+                        textView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -30)
+                        ])
+                }
+                
+                previousAnchor = textView.trailingAnchor
+                textView.tag = 100 + columnIndex
+                imageView.tag = 999
+                columnIndex = columnIndex + 1
                 let range = layoutManager.glyphRange(for: textContainer)
                 lastRenderedGlyph = range.length + range.location
                 
             }
+            previousAnchor.constraint(equalTo: scrollObj.trailingAnchor, constant: -10).isActive = true
+            
             
         }
-        
-        //        let imageUrl = URL(string: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxD2QTPxW4NROWV9CB2J7DigMhpjVkCbh4FlUUt6LchrTKCP7cxxy3nU2E")
-        //        let imageData = try? Data(contentsOf: imageUrl!)
-        
-        print(columnIndex)
-        //let page : CGFloat = columnIndex * currentXOffset
-        self.scrollObj.contentSize = CGSize(width: currentXOffset+20, height: self.scrollObj.frame.size.height)
-        self.scrollObj.isPagingEnabled = true
-        pageDots.numberOfPages = Int(columnIndex/3)
-        print(currentXOffset)
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -119,6 +177,20 @@ extension Data {
     var attributedString: NSAttributedString? {
         do {
             return try NSAttributedString(data: self, options:[NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: String.Encoding.utf8.rawValue], documentAttributes: nil)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        return nil
+    }
+    
+    var attributedStringColumnWise: NSMutableAttributedString? {
+        do {
+            let fontval = UIFont.systemFont(ofSize: 18)
+            
+            let   attrStr = try NSMutableAttributedString(data: self, options: [NSDocumentTypeDocumentAttribute:NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute:String.Encoding.utf8.rawValue], documentAttributes: nil)
+            attrStr.addAttributes([NSFontAttributeName: fontval
+                ,NSForegroundColorAttributeName:UIColor.black], range: NSRange(location: 0, length: attrStr.length))
+            return attrStr
         } catch let error as NSError {
             print(error.localizedDescription)
         }
