@@ -14,7 +14,7 @@ class ViewController: UIViewController,UIScrollViewDelegate {
     //  var textView = UITextView()
     @IBOutlet var scrollObj: UIScrollView!
     @IBOutlet var pageDots: UIPageControl!
-    let htmlString = "<div>This recipe is almost identical to the one in Two Different-Width Views; however, here you use a pair of constraints to define a more complex behavior for the view widths. In this recipe, the system tries to make the red view twice as wide as the blue view, but the blue view has a 150-point minimum width. So, on iPhone in portrait the views are almost the same width, and in landscape both views are larger, but the red view is now twice as wide as the blue.\n\n</div><div>Always select the layout that works best for your app. This recipe uses a fixed 20-point margin for both the top and bottom. This keeps the constraint logic as simple as possible, and still looks reasonable in all orientations. Other layouts may work better with a fixed 8-point margin.</div><div>You can extend this design by adding additional constraints—for example, by using three constraints. A required constraint to set the red view’s minimum width. A high-priority optional constraint to set the blue view’s minimum width, and a lower priority optional constraint to set the preferred size ratio between the views.</div>"
+    let htmlString = "<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p><div>This recipe is almost identical to the one in Two Different-Width Views; however, here you use a pair of constraints to define a more complex behavior for the view widths. In this recipe, the system tries to make the red view twice as wide as the blue view, but the blue view has a 150-point minimum width. So, on iPhone in portrait the views are almost the same width, and in landscape both views are larger, As well as most of the developers are using AutoLayout feature UIView's size in the beginning of initialization does not match the one on UIView's appearing. Thus we have either to initialize ContentView with MonthViews and all the appropriate stuff on UIView's appearing or initialize /n/n stuff as UIView's being initialized and then simply update frames. The first option doesn't work since there will be a flash effect (the initialization will be finished after your UIView appeared) according to what the CVCalendar has 2 parts of creating.but the red view is now twice as wide as the blue.\n\n</div><div>Always select the layout that works best for your app. This recipe uses a fixed 20-point margin for both the top and bottom. This keeps the constraint logic as simple as possible, and still looks reasonable in all orientations. Other layouts may work better with a fixed 8-point margin.</div><div>You can extend this design by adding additional constraints—for example, by using three constraints. A required constraint to set the red view’s minimum width. A high-priority optional constraint to set the blue view’s minimum width, and a lower priority optional constraint to set the preferred size ratio between the views.CryptoSwift uses array of bytes aka Array<UInt8> as a base type for all operations. Every data may be converted to a stream of bytes. You will find convenience functions that accept String or NSData, and it will be internally converted to the array of bytes.CryptoSwift uses array of bytes aka Array<UInt8> as a base type for all operations. Every data may be converted to a stream of bytes. You will find convenience functions that accept String or NSData, and it will be internally converted to the array of bytes.CryptoSwift uses array of bytes aka Array<UInt8> as a base type for all operations. Every data may be converted to a stream of bytes. You will find convenience functions that accept String or NSData, and it will be internally converted to the array of bytes.</div><div>As well as most of the developers are using AutoLayout feature UIView's size in the beginning of initialization does not match the one on UIView's appearing. Thus we have either to initialize ContentView with MonthViews and all the appropriate stuff on UIView's appearing or initialize stuff as UIView's being initialized and then simply update frames. The first option doesn't work since there will be a flash effect (the initialization will be finished after your UIView appeared) according to what the CVCalendar has 2 parts of creating.</div>"
     
     
     
@@ -68,21 +68,12 @@ class ViewController: UIViewController,UIScrollViewDelegate {
     }
     override func viewWillLayoutSubviews(){
         self.view.layoutIfNeeded()
-        //self .ect()
     }
     
     func ect() {
         
-        var temp = 0
         for view in scrollObj.subviews{
-            temp = temp + 1
-            let index = 100 + temp
-            if index == view.tag || view.tag == 999{
-                view .removeFromSuperview()
-            }else{
-                
-            }
-            //view .removeFromSuperview()
+            view .removeFromSuperview()
         }
         do {
             var textViewFrame = CGRect()
@@ -92,17 +83,12 @@ class ViewController: UIViewController,UIScrollViewDelegate {
             
             while lastRenderedGlyph < layoutManager.numberOfGlyphs  {
                 let textContainer = NSTextContainer(size: columnSize)
+                textContainer.heightTracksTextView = true
+                textContainer.widthTracksTextView = true
+
                 layoutManager.addTextContainer(textContainer)
+                textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
                 
-                if columnIndex == 1{
-                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
-                    
-                }else if columnIndex == 2{
-                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
-                    
-                }else{
-                    textViewFrame = CGRect(x: 0, y: 0, width: CGFloat(scrollWidth), height: CGFloat(scrollHeight))
-                }
                 // And a text view to render it
                 let textView = UITextView(frame: textViewFrame, textContainer: textContainer)
                 // And a text view to render it
